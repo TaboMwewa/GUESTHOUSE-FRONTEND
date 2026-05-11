@@ -1,0 +1,273 @@
+/* ── Internal Guesthouse Login – Clean, Underlined Inputs, Guesthouse Photo ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&family=Playfair+Display:wght@500;600&display=swap');
+
+:root {
+  --brick-red: #d64b2c;
+  --brick-red-glow: rgba(214, 75, 44, 0.3);
+  --pure-white: #ffffff;
+  --off-white: #faf9f8;
+  --charcoal: #2c2418;
+  --shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25);
+  --font-main: 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background: #f0ede8;
+}
+
+/* ── Page with bright background + sparklers ────────────── */
+.login-page {
+  min-height: 100vh;
+  background: url('https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1600')
+              center/cover no-repeat fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Sparklers (background particles) */
+.sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, #fff9e0, #ffd966);
+  border-radius: 50%;
+  opacity: 0;
+  box-shadow: 0 0 4px 1px #ffd966;
+  animation: floatSparkle 8s infinite ease-in-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes floatSparkle {
+  0% {
+    transform: translateY(100vh) scale(0.2);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-10vh) scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* ── Two‑column container ──────────────────────────────── */
+.login-container {
+  display: flex;
+  max-width: 1000px;
+  width: 100%;
+  background: var(--pure-white);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+
+.login-container:hover {
+  transform: translateY(-4px);
+}
+
+/* ── Left Panel – Guesthouse Photo (no text, just image) ── */
+.brand-panel {
+  flex: 1;
+  background: url('https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=800')
+              center/cover no-repeat;
+  min-height: 500px;
+}
+
+/* ── Right Panel – Internal Login Form ──────────────────── */
+.form-panel {
+  flex: 1;
+  padding: 3rem 2.5rem;
+  background: var(--pure-white);
+}
+
+.form-panel h2 {
+  font-family: var(--font-serif);
+  font-size: 1.9rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  margin-bottom: 0.5rem;
+}
+
+.form-panel > p {
+  color: #8a7b66;
+  font-size: 0.85rem;
+  margin-bottom: 2rem;
+  border-left: 3px solid var(--brick-red);
+  padding-left: 0.75rem;
+}
+
+/* Alerts */
+.alert-error, .alert-warning {
+  padding: 0.7rem 1rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff3ef;
+}
+
+.alert-error { color: #c23d1e; border-left: 4px solid var(--brick-red); }
+.alert-warning { color: #b2720e; border-left: 4px solid #f0b85b; }
+
+/* Form – underlined inputs with highlight effect */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #aa9a84;
+}
+
+.form-group input {
+  padding: 0.75rem 0;
+  border: none;
+  border-bottom: 2px solid #e0d6ca;
+  background: transparent;
+  font-size: 1rem;
+  font-family: var(--font-main);
+  transition: all 0.2s;
+  outline: none;
+}
+
+.form-group input:focus {
+  border-bottom-color: var(--brick-red);
+  border-bottom-width: 3px;
+  background: rgba(214, 75, 44, 0.02);
+  padding-left: 0.5rem;
+}
+
+.form-group input::placeholder {
+  color: #cfc6b8;
+  font-weight: 300;
+}
+
+/* Options row (Remember + Forgot password) */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  margin: 0.2rem 0 0.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  color: #6a5c4c;
+}
+
+.checkbox-label input {
+  accent-color: var(--brick-red);
+  width: 16px;
+  height: 16px;
+}
+
+.forgot-link {
+  color: var(--brick-red);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: #b33a1e;
+  text-decoration: underline;
+}
+
+/* Button – pill shape, gradient */
+.login-btn {
+  margin-top: 0.5rem;
+  padding: 0.9rem 1rem;
+  background: linear-gradient(105deg, var(--brick-red), #b33a1e);
+  color: white;
+  border: none;
+  border-radius: 60px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px var(--brick-red-glow);
+  background: linear-gradient(105deg, #e25c3a, #c43f20);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Footer */
+.login-footer {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.7rem;
+  color: #d1c5b5;
+  letter-spacing: 0.05em;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+  .login-container {
+    flex-direction: column;
+    max-width: 450px;
+  }
+  .brand-panel {
+    min-height: 200px;
+  }
+}
