@@ -50,7 +50,8 @@ function Login({ onLoginSuccess }) {
       localStorage.setItem('refresh_token', tokenRes.data.refresh);
 
       const usersRes = await api.get('/api/users/');
-      const users = usersRes.data;
+      // ✅ FIX: handle paginated response (results array)
+      const users = usersRes.data.results || usersRes.data;
       const currentUser = users.find((u) => u.username === username);
 
       if (!currentUser) throw new Error('Could not find user profile.');
