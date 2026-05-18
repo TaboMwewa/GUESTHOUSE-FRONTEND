@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../api/api';
+import Icon from '../components/common/Icon';
 import './Login.css';
 
 function Login({ onLoginSuccess }) {
@@ -8,7 +9,7 @@ function Login({ onLoginSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [coldStart, setColdStart] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);  // optional, you can implement later
+  const [rememberMe, setRememberMe] = useState(false);
 
   // Sparklers (background particles)
   useEffect(() => {
@@ -41,16 +42,11 @@ function Login({ onLoginSuccess }) {
     const coldStartTimer = setTimeout(() => setColdStart(true), 5000);
 
     try {
-      const tokenRes = await api.post(
-        '/api/token/',
-        { username, password },
-        { timeout: 70000 }
-      );
+      const tokenRes = await api.post('/token/', { username, password });
       localStorage.setItem('access_token', tokenRes.data.access);
       localStorage.setItem('refresh_token', tokenRes.data.refresh);
 
-      const usersRes = await api.get('/api/users/');
-      // ✅ FIX: handle paginated response (results array)
+      const usersRes = await api.get('/users/');
       const users = usersRes.data.results || usersRes.data;
       const currentUser = users.find((u) => u.username === username);
 
@@ -86,29 +82,44 @@ function Login({ onLoginSuccess }) {
   return (
     <div className="login-page">
       <div className="login-container">
-        {/* Left panel – guesthouse photo (no roles) */}
-        <div className="brand-panel"></div>
+        {/* Left panel – guesthouse photo */}
+        <div className="brand-panel">
+          <div className="brand-overlay">
+            <div className="brand-logo">
+              <Icon name="logo" size={40} color="white" />
+            </div>
+            <h1 className="brand-title">GuestHouse</h1>
+            <p className="brand-tagline">Luxury & Comfort</p>
+          </div>
+        </div>
 
-        {/* Right panel – internal login form */}
+        {/* Right panel – login form */}
         <div className="form-panel">
-          <h2>Welcome back</h2>
-          <p>Sign in to your account</p>
+          <div className="form-header">
+            <h2>Welcome back</h2>
+            <p>Sign in to your account</p>
+          </div>
 
           {error && (
             <div className="alert-error">
-              <span>⚠️</span> {error}
+              <Icon name="alert-circle" size={16} />
+              {error}
             </div>
           )}
 
           {coldStart && !error && (
             <div className="alert-warning">
-              <span>⏳</span> Server is waking up — this can take up to 60 seconds. Please wait…
+              <Icon name="clock" size={16} />
+              Server is waking up — this can take up to 60 seconds. Please wait…
             </div>
           )}
 
           <form className="login-form" onSubmit={handleLogin}>
             <div className="form-group">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username">
+                <Icon name="user" size={12} />
+                Username
+              </label>
               <input
                 id="username"
                 type="text"
@@ -122,7 +133,10 @@ function Login({ onLoginSuccess }) {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">
+                <Icon name="lock" size={12} />
+                Password
+              </label>
               <input
                 id="password"
                 type="password"
@@ -135,7 +149,6 @@ function Login({ onLoginSuccess }) {
               />
             </div>
 
-            {/* Row: Remember me + Forgot password? */}
             <div className="form-options">
               <label className="checkbox-label">
                 <input
@@ -145,7 +158,9 @@ function Login({ onLoginSuccess }) {
                 />
                 <span>Remember me</span>
               </label>
-              <a href="#" className="forgot-link">Forgot password?</a>
+              <button type="button" className="forgot-link" onClick={() => alert('Contact your administrator to reset password.')}>
+                Forgot password?
+              </button>
             </div>
 
             <button type="submit" className="login-btn" disabled={loading}>
@@ -155,12 +170,18 @@ function Login({ onLoginSuccess }) {
                   Signing in…
                 </span>
               ) : (
-                'Sign In'
+                <>
+                  <Icon name="log-in" size={16} />
+                  Sign In
+                </>
               )}
             </button>
           </form>
 
-          <div className="login-footer">Authorised staff only</div>
+          <div className="login-footer">
+            <Icon name="shield" size={12} />
+            Authorised staff only
+          </div>
         </div>
       </div>
     </div>

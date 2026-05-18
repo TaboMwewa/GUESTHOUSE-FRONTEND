@@ -1,8 +1,11 @@
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
+
 const api = axios.create({
-  baseURL: 'https://guesthouse-api-3oa0.onrender.com',
+  baseURL: `${API_URL}/api/`,
   headers: { 'Content-Type': 'application/json' },
+  timeout: 70000,
 });
 
 // Attach token to every request
@@ -22,7 +25,7 @@ api.interceptors.response.use(
       const refreshToken = localStorage.getItem('refresh_token');
       try {
         const response = await axios.post(
-          'https://guesthouse-api-3oa0.onrender.com/api/token/refresh/',
+          `${API_URL}/api/token/refresh/`,
           { refresh: refreshToken }
         );
         localStorage.setItem('access_token', response.data.access);
