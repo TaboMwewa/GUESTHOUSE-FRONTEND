@@ -112,7 +112,7 @@ function BudgetsView({ budgets, onSuccess, loading }) {
   };
 
   const handleReview = async (budgetId, status, comment) => {
-    await api.post(`/api/budgets/${budgetId}/review_budget/`, { status, comment });
+    await api.post(`/budgets/${budgetId}/review_budget/`, { status, comment });
     onSuccess();
   };
 

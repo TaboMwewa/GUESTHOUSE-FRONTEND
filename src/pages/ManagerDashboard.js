@@ -59,13 +59,13 @@ function ManageRooms({ rooms, onSuccess, loading }) {
   };
 
   const handleUpdate = async (formData) => {
-    await api.put(`/api/rooms/${editingRoom.id}/`, { ...formData, capacity: parseInt(formData.capacity) });
+    await api.put(`/rooms/${editingRoom.id}/`, { ...formData, capacity: parseInt(formData.capacity) });
     onSuccess();
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this room?')) return;
-    await api.delete(`/api/rooms/${id}/`);
+    await api.delete(`/rooms/${id}/`);
     onSuccess();
   };
 
@@ -118,7 +118,7 @@ function BudgetRequestsReview({ requests, onSuccess, loading }) {
   const [showModal, setShowModal] = useState(false);
 
   const handleReview = async (id, status, comment) => {
-    await api.post(`/api/budget-requests/${id}/submit_review/`, { status, comment });
+    await api.post(`/budget-requests/${id}/submit_review/`, { status, comment });
     onSuccess();
   };
 

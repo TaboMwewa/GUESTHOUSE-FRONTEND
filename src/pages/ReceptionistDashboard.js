@@ -71,7 +71,7 @@ function GuestsView({ allocations, onSuccess, loading }) {
   const handleCheckout = async (id) => {
     setCheckingOutId(id);
     try {
-      await api.post(`/api/room-allocations/${id}/check_out/`);
+      await api.post(`/room-allocations/${id}/check_out/`);
       onSuccess();
     } catch (err) {
       alert(err.response?.data?.detail || 'Checkout failed.');

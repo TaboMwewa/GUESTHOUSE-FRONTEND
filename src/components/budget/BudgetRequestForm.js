@@ -9,6 +9,14 @@ export default function BudgetRequestForm({ isOpen, onClose, onSubmit }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Validate amount is positive
+    const amount = parseFloat(form.amount);
+    if (!form.amount || amount <= 0) {
+      setError('Amount must be greater than 0');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await onSubmit(form);
@@ -52,7 +60,11 @@ export default function BudgetRequestForm({ isOpen, onClose, onSubmit }) {
         </Modal.Body>
         <Modal.Footer>
           <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-          <button type="submit" className="btn btn-primary" disabled={submitting}>
+          <button 
+            type="submit" 
+            className="btn btn-primary" 
+            disabled={submitting || !form.amount || parseFloat(form.amount) <= 0 || !form.purpose}
+          >
             {submitting ? <><span className="spinner"/>Submitting…</> : 'Submit Request'}
           </button>
         </Modal.Footer>
