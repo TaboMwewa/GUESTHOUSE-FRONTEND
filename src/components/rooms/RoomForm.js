@@ -17,6 +17,21 @@ export default function RoomForm({ isOpen, onClose, onSubmit, editing, initialDa
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Validate room number
+    const roomNo = parseInt(form.room_no);
+    if (!form.room_no || isNaN(roomNo) || roomNo <= 0) {
+      setError('Room number must be a positive number');
+      return;
+    }
+
+    // Validate price per night
+    const price = parseFloat(form.price_per_night);
+    if (!form.price_per_night || isNaN(price) || price < 0) {
+      setError('Price per night must be a non-negative number');
+      return;
+    }
+
     setSaving(true);
     try {
       await onSubmit(form);
@@ -38,6 +53,8 @@ export default function RoomForm({ isOpen, onClose, onSubmit, editing, initialDa
             <div className="form-group">
               <label>Room Number</label>
               <input 
+                type="number"
+                min="1"
                 value={form.room_no} 
                 onChange={e => setForm({...form, room_no: e.target.value})} 
                 placeholder="e.g. 101" 
@@ -73,6 +90,7 @@ export default function RoomForm({ isOpen, onClose, onSubmit, editing, initialDa
             <div className="form-group span-2">
               <label>Price Per Night (K)</label>
               <input 
+                min="0"
                 type="number" 
                 step="0.01" 
                 value={form.price_per_night} 

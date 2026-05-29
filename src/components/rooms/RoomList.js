@@ -37,7 +37,7 @@ export default function RoomList({ rooms, loading, showActions = false, onEdit, 
                   <button 
                     className="btn btn-sm" 
                     style={{ background: 'var(--danger-bg)', color: 'var(--danger)' }} 
-                    onClick={() => onDelete?.(room.id)}
+                    onClick={() => onDelete?.(room)}   // ← CHANGED: pass full room object
                   >
                     <Icon name="delete" size={14} />
                   </button>

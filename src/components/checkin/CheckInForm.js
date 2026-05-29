@@ -121,10 +121,18 @@ export default function CheckInForm({ rooms, onSuccess }) {
       setLoading(false);
       return;
     }
-    if (paymentAmount && parseFloat(paymentAmount) <= 0) {
-      setError('Payment amount must be greater than zero if provided.');
-      setLoading(false);
-      return;
+    if (paymentAmount) {
+      const amount = parseFloat(paymentAmount);
+      if (amount <= 0) {
+        setError('Payment amount must be greater than zero if provided.');
+        setLoading(false);
+        return;
+      }
+      if (selectedRoom && amount < selectedRoom.price_per_night) {
+        setError(`Payment amount must be at least ${fmt(selectedRoom.price_per_night)} (minimum room rate).`);
+        setLoading(false);
+        return;
+      }
     }
 
     // Sanitize inputs
@@ -286,10 +294,17 @@ export default function CheckInForm({ rooms, onSuccess }) {
                 <input 
                   type="number" 
                   step="0.01" 
+                  min={selectedRoom ? selectedRoom.price_per_night : 0}
                   value={paymentAmount} 
                   onChange={e => setPaymentAmount(e.target.value)} 
                   placeholder="0.00" 
                 />
+                {selectedRoom && (
+                  <small style={{ color: 'var(--text-muted)', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.25rem' }}>
+                    <Icon name="info" size={10} />
+                    Minimum: {fmt(selectedRoom.price_per_night)}
+                  </small>
+                )}
                 <FieldError field="amount" />
               </div>
               <div className="form-group">

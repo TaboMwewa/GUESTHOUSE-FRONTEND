@@ -10,6 +10,7 @@ export default function StatsGrid({ stats }) {
           value={stat.value}
           label={stat.label}
           variant={stat.variant}
+          format={stat.format}
         />
       ))}
     </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import api from '../api/api';
 import Sidebar from '../components/common/Sidebar';
 import StatsGrid from '../components/overview/StatsGrid';
+import StatsCard from '../components/common/StatsCard';
 import RecentAllocations from '../components/overview/RecentAllocations';
 import RoomList from '../components/rooms/RoomList';
 import PaymentList from '../components/payments/PaymentList';
@@ -9,31 +10,114 @@ import GuestList from '../components/guests/GuestList';
 import CheckInForm from '../components/checkin/CheckInForm';
 import BudgetRequestList from '../components/budget/BudgetRequestList';
 import BudgetRequestForm from '../components/budget/BudgetRequestForm';
+import UpcomingCheckouts from '../components/common/UpcomingCheckouts';
 import './theme.css';
 
-// ── Overview Component ────────────────────────────────────
+// ── Overview Component (with today’s check‑ins + sparkline) ──
 function Overview({ rooms, allocations, payments, setActive }) {
   const available = rooms.filter(r => r.status === 'AVAILABLE').length;
   const occupied = rooms.filter(r => r.status === 'OCCUPIED').length;
   const activeGuests = allocations.filter(a => !a.checked_out_at).length;
 
-  const today = payments.filter(p => {
-    const d = new Date(p.created_at || p.date || '');
-    const n = new Date();
-    return d.toDateString() === n.toDateString();
-  });
-  const todayRevenue = today.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
+  // Today's revenue
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  const todayRevenue = payments
+    .filter(p => (p.created_at || p.date).split('T')[0] === todayStr)
+    .reduce((s, p) => s + parseFloat(p.amount || 0), 0);
 
+  // Last 7 days revenue trend (sparkline)
+  const last7DaysRevenue = () => {
+    const result = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dayStr = d.toISOString().split('T')[0];
+      const dayRevenue = payments
+        .filter(p => (p.created_at || p.date).split('T')[0] === dayStr)
+        .reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+      result.push(dayRevenue);
+    }
+    return result;
+  };
+  const revenueTrend = last7DaysRevenue();
+
+  // Inside Overview component, after calculating todayStr
+const todayCheckins = allocations.filter(a => {
+  if (a.checked_out_at) return false;
+  
+  // Try multiple possible field names for check-in date
+  const checkin = a.check_in_date || a.checkin_date || a.checkInDate || a.checkinDate;
+  if (!checkin) return false;
+  
+  const checkinDateStr = new Date(checkin).toISOString().split('T')[0];
+  return checkinDateStr === todayStr;
+});
+
+// Debug log
+if (allocations.length > 0) {
+  console.log('Sample allocation for check-ins:', allocations[0]);
+  console.log('Today\'s check-ins found:', todayCheckins.length);
+}
+
+  // Stats for the grid (excluding revenue, shown separately)
   const stats = [
-    { icon: 'available', value: available, label: 'Available Rooms', variant: 'default' },
-    { icon: 'occupied', value: occupied, label: 'Occupied Rooms', variant: 'default' },
-    { icon: 'active-guests', value: activeGuests, label: 'Active Guests', variant: 'green' },
-    { icon: 'revenue', value: todayRevenue, label: "Today's Revenue", variant: 'gold' },
+    { icon: 'available', value: available, label: 'Available Rooms', variant: 'default', format: false },
+    { icon: 'occupied', value: occupied, label: 'Occupied Rooms', variant: 'default', format: false },
+    { icon: 'active-guests', value: activeGuests, label: 'Active Guests', variant: 'green', format: false },
   ];
 
   return (
     <div>
+      {/* Revenue card with sparkline */}
+      <div className="stats-grid">
+        <StatsCard
+          icon="revenue"
+          value={todayRevenue}
+          label="Today's Revenue"
+          variant="gold"
+          format={true}
+          trend={revenueTrend}
+        />
+      </div>
+
       <StatsGrid stats={stats} />
+
+      {/* Today’s Check‑ins Widget */}
+      {todayCheckins.length > 0 && (
+        <div className="card" style={{ marginBottom: '1.5rem', borderLeft: '4px solid #2a9d8f' }}>
+          <div className="card-header">
+            <span className="card-title">📅 Today's Check‑ins</span>
+            <span className="badge badge-green">{todayCheckins.length} guests</span>
+          </div>
+          <div className="table-wrap">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Guest</th>
+                  <th>Room</th>
+                  <th>Contact</th>
+                </tr>
+              </thead>
+              <tbody>
+                {todayCheckins.map(a => {
+                  const room = rooms.find(r => r.id === a.room);
+                  return (
+                    <tr key={a.id}>
+                      <td>{a.guest_name}</td>
+                      <td>Room {room?.number || a.room}</td>
+                      <td>{a.guest_contact}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Upcoming checkouts widget */}
+      <UpcomingCheckouts allocations={allocations} rooms={rooms} />
 
       <div className="card">
         <div className="card-header">
