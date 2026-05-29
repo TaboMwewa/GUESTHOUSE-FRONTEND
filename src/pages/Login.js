@@ -11,11 +11,9 @@ function Login({ onLoginSuccess }) {
   const [coldStart, setColdStart] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Sparklers (background particles)
   useEffect(() => {
     const page = document.querySelector('.login-page');
     if (!page) return;
-
     for (let i = 0; i < 50; i++) {
       const sparkle = document.createElement('div');
       sparkle.classList.add('sparkle');
@@ -26,10 +24,8 @@ function Login({ onLoginSuccess }) {
       sparkle.style.height = sparkle.style.width;
       page.appendChild(sparkle);
     }
-
     return () => {
-      const sparkles = document.querySelectorAll('.sparkle');
-      sparkles.forEach(s => s.remove());
+      document.querySelectorAll('.sparkle').forEach(s => s.remove());
     };
   }, []);
 
@@ -38,30 +34,22 @@ function Login({ onLoginSuccess }) {
     setError('');
     setLoading(true);
     setColdStart(false);
-
     const coldStartTimer = setTimeout(() => setColdStart(true), 5000);
-
     try {
       const tokenRes = await api.post('/token/', { username, password });
       localStorage.setItem('access_token', tokenRes.data.access);
       localStorage.setItem('refresh_token', tokenRes.data.refresh);
-
       const usersRes = await api.get('/users/');
       const users = usersRes.data.results || usersRes.data;
       const currentUser = users.find((u) => u.username === username);
-
       if (!currentUser) throw new Error('Could not find user profile.');
-
-      const role = currentUser.userprofile.role;
-      const fullName = currentUser.userprofile.full_name;
-
+      const role = currentUser.userprofile?.role;
+      const fullName = currentUser.userprofile?.full_name;
+      if (!role) throw new Error('User profile is missing a role.');
       localStorage.setItem('user_role', role);
       localStorage.setItem('user_full_name', fullName);
       localStorage.setItem('user_id', currentUser.id);
-
-      if (onLoginSuccess) {
-        onLoginSuccess({ role, fullName, username });
-      }
+      if (onLoginSuccess) onLoginSuccess({ role, fullName, username });
     } catch (err) {
       if (err.code === 'ECONNABORTED') {
         setError('Request timed out. The server may be waking up — please try again.');
@@ -69,8 +57,10 @@ function Login({ onLoginSuccess }) {
         setError('Incorrect username or password. Please try again.');
       } else if (err.message === 'Could not find user profile.') {
         setError('Login succeeded but user profile could not be loaded. Contact support.');
+      } else if (err.message === 'User profile is missing a role.') {
+        setError('Your account has no role assigned. Contact your administrator.');
       } else {
-        setError('Something went wrong. Please check your connection and try again.');
+        setError(`Something went wrong: ${err.message}`);
       }
     } finally {
       clearTimeout(coldStartTimer);
@@ -82,7 +72,6 @@ function Login({ onLoginSuccess }) {
   return (
     <div className="login-page">
       <div className="login-container">
-        {/* Left panel – guesthouse photo */}
         <div className="brand-panel">
           <div className="brand-overlay">
             <div className="brand-logo">
@@ -92,28 +81,24 @@ function Login({ onLoginSuccess }) {
             <p className="brand-tagline">Luxury & Comfort</p>
           </div>
         </div>
-
-        {/* Right panel – login form */}
         <div className="form-panel">
           <div className="form-header">
             <h2>Welcome back</h2>
             <p>Sign in to your account</p>
           </div>
-
           {error && (
             <div className="alert-error">
               <Icon name="alert-circle" size={16} />
               {error}
+              <button className="alert-close" onClick={() => setError('')}>✕</button>
             </div>
           )}
-
           {coldStart && !error && (
             <div className="alert-warning">
               <Icon name="clock" size={16} />
               Server is waking up — this can take up to 60 seconds. Please wait…
             </div>
           )}
-
           <form className="login-form" onSubmit={handleLogin}>
             <div className="form-group">
               <label htmlFor="username">
@@ -131,7 +116,6 @@ function Login({ onLoginSuccess }) {
                 autoComplete="username"
               />
             </div>
-
             <div className="form-group">
               <label htmlFor="password">
                 <Icon name="lock" size={12} />
@@ -148,7 +132,6 @@ function Login({ onLoginSuccess }) {
                 autoComplete="current-password"
               />
             </div>
-
             <div className="form-options">
               <label className="checkbox-label">
                 <input
@@ -162,7 +145,6 @@ function Login({ onLoginSuccess }) {
                 Forgot password?
               </button>
             </div>
-
             <button type="submit" className="login-btn" disabled={loading}>
               {loading ? (
                 <span className="btn-inner">
@@ -177,7 +159,6 @@ function Login({ onLoginSuccess }) {
               )}
             </button>
           </form>
-
           <div className="login-footer">
             <Icon name="shield" size={12} />
             Authorised staff only
